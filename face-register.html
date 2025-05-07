@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Face Registration</title>
+  
+  <!-- Update TensorFlow.js and face-api.js versions -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #000033, #000000);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    video {
+      margin-top: 20px;
+      border: 2px solid #2575fc;
+      border-radius: 10px;
+    }
+    #controls {
+      margin-top: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #2575fc;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #6a11cb;
+    }
+    #status {
+      margin-top: 10px;
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <h2>Face Registration System</h2>
+  <video id="video" width="720" height="560" autoplay muted></video>
+  <div id="controls">
+    <input type="text" id="name" placeholder="Enter your name">
+    <button id="registerBtn">Register Face</button>
+    <div style="margin-top: 20px;">
+        <button onclick="window.location.href='index.html'" style="background: #4CAF50;">
+            Already Registered? Login Here
+        </button>
+    </div>
+</div>
+  <p id="status"></p>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAndLq3zZpSK4iGhWmGlKam6O0WS1woXVE",
+      authDomain: "face-58119.firebaseapp.com",
+      projectId: "face-58119",
+      storageBucket: "face-58119.appspot.com",
+      messagingSenderId: "78948933496",
+      appId: "1:78948933496:web:10b3c012fecd8d6950f28d",
+      measurementId: "G-YKS0PG13K9"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const video = document.getElementById("video");
+    const status = document.getElementById("status");
+    const registerBtn = document.getElementById("registerBtn");
+
+    // Load face-api models
+    async function loadModels() {
+      status.textContent = "Loading face recognition models...";
+      try {
+        // Wait for face-api to be ready
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Load models sequentially instead of parallel
+        await faceapi.nets.ssdMobilenetv1.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
+        status.textContent = "Loading landmarks model...";
+        await faceapi.nets.faceLandmark68Net.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
+        status.textContent = "Loading recognition model...";
+        await faceapi.nets.faceRecognitionNet.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
+        
+        status.textContent = "Models loaded successfully";
+        await startVideo();
+      } catch (error) {
+        status.textContent = "Error loading models: " + error.message;
+        console.error(error);
+      }
+    }
+
+    // Start video with improved error handling
+    async function startVideo() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: {
+            width: { ideal: 720 },
+            height: { ideal: 560 },
+            facingMode: "user"
+          }
+        });
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+          status.textContent = "Camera ready for face detection";
+        };
+      } catch (err) {
+        status.textContent = "Camera error: " + err.message;
+        console.error("Camera access error:", err);
+      }
+    }
+
+    // Register face
+    async function registerFace() {
+      const name = document.getElementById("name").value;
+      if (!name) {
+        status.textContent = "Please enter a name!";
+        return;
+      }
+
+      try {
+        status.textContent = "Detecting face...";
+        const detections = await faceapi.detectAllFaces(video)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
+
+        if (!detections.length) {
+          status.textContent = "No face detected. Please try again.";
+          return;
+        }
+
+        const faceDescriptor = Array.from(detections[0].descriptor);
+        
+        await db.collection("faces").add({
+          name: name,
+          descriptor: faceDescriptor,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        status.textContent = "Face registered successfully!";
+      } catch (error) {
+        status.textContent = "Error: " + error.message;
+        console.error("Registration error:", error);
+      }
+    }
+
+    // Event listeners
+    registerBtn.addEventListener('click', registerFace);
+    document.addEventListener('DOMContentLoaded', loadModels);
+  </script>
+</body>
+</html>

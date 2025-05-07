@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="icon" href="data:,"> <!-- Fix favicon issue -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #000033, #000000);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Form Container */
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 16px;
+    }
+
+    input::placeholder {
+      color: #ddd;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #2575fc;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #6a11cb;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Register</h2>
+    <form id="register-form">
+      <input type="text" id="name" placeholder="Full Name" required /><br />
+      <input type="email" id="email" placeholder="Email" required /><br />
+      <input type="password" id="password" placeholder="Password" required /><br />
+      <button type="submit">Register</button>
+    </form>
+    <div style="text-align: center; margin-top: 20px;">
+      <button onclick="window.location.href='face-register.html'" style="background: #1a237e; max-width: 250px;">
+        Register with Face Recognition
+      </button>
+    </div>
+    <p style="text-align: center; margin-top: 15px;">
+      Already have an account? <a href="login.html" style="color: #2575fc; text-decoration: none;">Login here</a>
+    </p>
+  </div>
+
+  <script type="module">
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAndLq3zZpSK4iGhWmGlKam6O0WS1woXVE",
+      authDomain: "face-58119.firebaseapp.com",
+      projectId: "face-58119",
+      storageBucket: "face-58119.appspot.com",
+      messagingSenderId: "78948933496",
+      appId: "1:78948933496:web:10b3c012fecd8d6950f28d",
+      measurementId: "G-YKS0PG13K9"
+    };
+
+    // Initialize Firebase
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Handle register form submission
+    document.getElementById("register-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        alert("Registered successfully!");
+
+        // Redirect to login page
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Error registering user:", error);
+        alert("Error registering user: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>

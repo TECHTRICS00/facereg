@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Recognition Login</title>
+  
+  <!-- Update script imports -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #000033, #000000);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      margin: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 16px;
+    }
+
+    input::placeholder {
+      color: #ddd;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      background: #2575fc;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #6a11cb;
+    }
+
+    #video {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border: 3px solid #333;
+    }
+
+    .face-login-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .or-divider {
+      margin: 20px 0;
+      text-align: center;
+      position: relative;
+    }
+
+    .or-divider:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .or-divider span {
+      background: rgba(0, 0, 51, 0.8);
+      padding: 0 10px;
+      color: #fff;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Face Recognition Login</h2>
+    
+    <div class="face-login-section">
+      <button id="start-camera">Start Camera</button>
+      <video id="video" width="720" height="560" autoplay muted playsinline></video>
+      <button id="face-login-btn" style="display: none;">Login with Face</button>
+      <p id="status" style="color: #4CAF50; margin-top: 10px;"></p>
+    </div>
+
+    <p style="text-align: center; margin-top: 15px;">
+      New user? <a href="face-register.html" style="color: #2575fc; text-decoration: none;">Register your face</a>
+    </p>
+  </div>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAndLq3zZpSK4iGhWmGlKam6O0WS1woXVE",
+      authDomain: "face-58119.firebaseapp.com",
+      projectId: "face-58119",
+      storageBucket: "face-58119.appspot.com",
+      messagingSenderId: "78948933496",
+      appId: "1:78948933496:web:10b3c012fecd8d6950f28d",
+      measurementId: "G-YKS0PG13K9"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+    const startCamera = document.getElementById('start-camera');
+    const faceLoginBtn = document.getElementById('face-login-btn');
+    let isVideoPlaying = false;
+
+    // Load face-api models
+    async function loadModels() {
+      status.textContent = "Loading face recognition models...";
+      try {
+        await Promise.all([
+          faceapi.nets.ssdMobilenetv1.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights'),
+          faceapi.nets.faceLandmark68Net.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights'),
+          faceapi.nets.faceRecognitionNet.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights')
+        ]);
+        status.textContent = "Models loaded successfully";
+        startCamera.disabled = false;
+      } catch (error) {
+        status.textContent = "Error loading models: " + error.message;
+        console.error(error);
+      }
+    }
+
+    // Start video
+    async function startVideo() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: {
+            width: { ideal: 720 },
+            height: { ideal: 560 },
+            facingMode: "user"
+          }
+        });
+        video.srcObject = stream;
+        video.play();
+        isVideoPlaying = true;
+        faceLoginBtn.style.display = 'block';
+        status.textContent = "Camera ready for face detection";
+      } catch (err) {
+        status.textContent = "Camera error: " + err.message;
+        console.error(err);
+      }
+    }
+
+    // Face login
+    async function faceLogin() {
+      if (!isVideoPlaying) return;
+
+      try {
+        status.textContent = "Detecting face...";
+        const detection = await faceapi.detectSingleFace(video)
+          .withFaceLandmarks()
+          .withFaceDescriptor();
+
+        if (!detection) {
+          status.textContent = "No face detected. Please try again.";
+          return;
+        }
+
+        const currentFaceDescriptor = detection.descriptor;
+        
+        // Get registered faces from Firebase
+        const facesSnapshot = await db.collection("faces").get();
+        
+        if (facesSnapshot.empty) {
+          status.textContent = "No registered users found. Please register first.";
+          return;
+        }
+
+        const registeredFaces = [];
+        facesSnapshot.forEach(doc => {
+          registeredFaces.push({
+            name: doc.data().name,
+            descriptor: new Float32Array(doc.data().descriptor),
+            timestamp: doc.data().timestamp
+          });
+        });
+
+        // Find best match with stricter threshold
+        let bestMatch = null;
+        let bestDistance = Infinity;
+        const threshold = 0.4; // Stricter threshold for better security
+        
+        registeredFaces.forEach(face => {
+          const distance = faceapi.euclideanDistance(currentFaceDescriptor, face.descriptor);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestMatch = face;
+          }
+        });
+
+        // Verify match with additional checks
+        if (bestMatch && bestDistance < threshold) {
+          // Log successful login attempt
+          await db.collection("access_logs").add({
+            name: bestMatch.name,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            success: true
+          });
+
+          // Store user info in localStorage
+          localStorage.setItem('userName', bestMatch.name);
+          localStorage.setItem('loginTime', new Date().toISOString());
+
+          status.textContent = `Welcome back, ${bestMatch.name}!`;
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1500);
+        } else {
+          // Log failed attempt
+          await db.collection("access_logs").add({
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            success: false
+          });
+          
+          status.textContent = 'Face not recognized. Please register or try again.';
+        }
+
+      } catch (error) {
+        status.textContent = "Error: " + error.message;
+        console.error("Face login error:", error);
+      }
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', loadModels);
+    startCamera.addEventListener('click', startVideo);
+    faceLoginBtn.addEventListener('click', faceLogin);
+  </script>
+</body>
+</html>
