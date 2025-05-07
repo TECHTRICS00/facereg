@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+
+/* Enhanced Dashboard CSS */
+
+/* Base Styles */
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: linear-gradient(
+        45deg,
+        #1e3c72 0%,
+        #2a5298 25%,
+        #4776b9 50%,
+        #89a7d9 75%,
+        #e0e8f9 100%
+    );
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    animation: gradientBG 15s ease infinite;
+    background-size: 400% 400%;
+    transition: all 0.3s ease;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(30, 60, 114, 0.2);
+    animation: fadeIn 0.8s ease;
+}
+
+.welcome-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #1e3c72, #4776b9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Dashboard Content Layout */
+.dashboard-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    animation: slideUp 0.8s ease;
+}
+
+/* Card Styling */
+.card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    animation: fadeIn 0.8s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.card h3 {
+    font-size: 1.3rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #1e3c72;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.card h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 50px;
+    background: linear-gradient(45deg, #1e3c72, #4776b9);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.card:hover h3::after {
+    width: 100px;
+}
+
+/* Profile Card Specific Styles */
+.profile-card {
+    text-align: center;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    padding: 5px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(30, 60, 114, 0.2);
+    animation: pulse 2s infinite;
+}
+
+.profile-card:hover .profile-image {
+    transform: scale(1.05);
+    border-color: #1e3c72;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(30, 60, 114, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(30, 60, 114, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(30, 60, 114, 0); }
+}
+
+#profile-name {
+    background: linear-gradient(45deg, #1e3c72, #4776b9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+/* User Stats Section */
+.user-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.stat-item {
+    background: rgba(37, 117, 252, 0.15);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    color: #1e3c72;
+}
+
+.stat-item:hover {
+    background: rgba(37, 117, 252, 0.25);
+    transform: translateY(-3px);
+}
+
+.stat-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.stat-item p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Access History Styling */
+#access-history ul {
+    list-style: none;
+    padding: 0;
+}
+
+#access-history li {
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    border-left: 3px solid #2575fc;
+    transition: all 0.3s ease;
+    color: #1e3c72;
+}
+
+#access-history li:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(5px);
+}
+
+/* Button Styling */
+button {
+    background: linear-gradient(45deg, #1e3c72, #4776b9);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(30, 60, 114, 0.4);
+}
+
+button:active {
+    transform: translateY(-1px);
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+}
+
+button:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(100, 100);
+        opacity: 0;
+    }
+}
+
+.logout-btn {
+    background: linear-gradient(45deg, #ff7170, #ff2c55);
+}
+
+.logout-btn:hover {
+    background: linear-gradient(45deg, #ff2c55, #ff7170);
+}
+
+/* Attendance Chart & List */
+.attendance-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    color: #1e3c72;
+}
+
+.attendance-item:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(5px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+    0% { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .user-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.loading div {
+    position: absolute;
+    border: 4px solid #2575fc;
+    opacity: 1;
+    border-radius: 50%;
+    animation: loading 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.loading div:nth-child(2) {
+    animation-delay: -0.5s;
+}
+
+@keyframes loading {
+    0% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        top: 0px;
+        left: 0px;
+        width: 72px;
+        height: 72px;
+        opacity: 0;
+    }
+}
+
+/* Page Transition Effect */
+.page-transition {
+    animation: pageTransition 0.5s ease;
+}
+
+@keyframes pageTransition {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Quick Action Button Group */
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.quick-actions button {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Tooltip Styles */
+[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+}
+
+[data-tooltip]:before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+[data-tooltip]:hover:before {
+    opacity: 1;
+    visibility: visible;
+    bottom: calc(100% + 10px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <div class="welcome-text">Welcome, <span id="user-name">User</span>!</div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Update the profile card section -->
+            <div class="card profile-card">
+                <h3>Profile Information</h3>
+                <div class="profile-info">
+                    <img id="profile-image" src="https://via.placeholder.com/150" alt="Profile" class="profile-image">
+                    <div>
+                        <h2 id="profile-name" style="color: #2575fc; margin-bottom: 20px;">Loading...</h2>
+                        <div class="user-stats">
+                            <div class="stat-item">
+                                <h4>Last Login</h4>
+                                <p id="last-login">Loading...</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4>Total Logins</h4>
+                                <p id="login-count">0</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4>Member Since</h4>
+                                <p id="member-since">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Access History</h3>
+                <div id="access-history">
+                    Loading access history...
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <button class="logout-btn" onclick="window.location.href='face-register.html'">Update Face Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAndLq3zZpSK4iGhWmGlKam6O0WS1woXVE",
+            authDomain: "face-58119.firebaseapp.com",
+            projectId: "face-58119",
+            storageBucket: "face-58119.appspot.com",
+            messagingSenderId: "78948933496",
+            appId: "1:78948933496:web:10b3c012fecd8d6950f28d",
+            measurementId: "G-YKS0PG13K9"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Get user data from URL parameters or localStorage
+        const userName = localStorage.getItem('userName') || 'User';
+        document.getElementById('user-name').textContent = userName;
+        document.getElementById('profile-name').textContent = userName;
+
+        // Set last login time
+        const lastLogin = new Date().toLocaleString();
+        document.getElementById('last-login').textContent = lastLogin;
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('userName');
+            window.location.href = 'login.html';
+        }
+
+        // Update access history
+        async function updateAccessHistory() {
+            const accessHistory = document.getElementById('access-history');
+            try {
+                // Modified query to use single field index until composite index is ready
+                const historySnapshot = await db.collection('access_logs')
+                    .where('name', '==', userName)
+                    .get();
+
+                if (historySnapshot.empty) {
+                    accessHistory.innerHTML = '<p>No access history found.</p>';
+                    return;
+                }
+
+                // Sort the data client-side temporarily
+                const sortedData = historySnapshot.docs
+                    .map(doc => ({
+                        ...doc.data(),
+                        timestamp: doc.data().timestamp.toDate()
+                    }))
+                    .sort((a, b) => b.timestamp - a.timestamp)
+                    .slice(0, 5);
+
+                let historyHTML = '<ul style="list-style: none; padding: 0;">';
+                sortedData.forEach(data => {
+                    historyHTML += `<li style="margin-bottom: 10px;">
+                        Accessed on ${data.timestamp.toLocaleString()}
+                    </li>`;
+                });
+                historyHTML += '</ul>';
+                accessHistory.innerHTML = historyHTML;
+            } catch (error) {
+                accessHistory.innerHTML = '<p>Error loading access history.</p>';
+                console.error('Error:', error);
+            }
+        }
+
+        // Modify loadEmployeeData function similarly
+        async function loadEmployeeData() {
+            try {
+                const logsSnapshot = await db.collection('access_logs')
+                    .where('name', '==', userName)
+                    .get();
+
+                // Rest of the function remains the same
+                // ... existing code ...
+            } catch (error) {
+                console.error('Error loading employee data:', error);
+            }
+        }
+
+        function createAttendanceChart(data) {
+            const ctx = document.getElementById('attendance-chart').getContext('2d');
+            const last7Days = data.slice(0, 7).reverse();
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: last7Days.map(d => d.date.toLocaleDateString()),
+                    datasets: [{
+                        label: 'Hours Worked',
+                        data: last7Days.map(d => d.hours),
+                        backgroundColor: 'rgba(37, 117, 252, 0.5)',
+                        borderColor: 'rgba(37, 117, 252, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#fff'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAttendanceList(data) {
+            const attendanceList = document.getElementById('attendance-list');
+            const html = data.slice(0, 10).map(entry => `
+                <div class="attendance-item">
+                    <span>${entry.date.toLocaleDateString()}</span>
+                    <span>${entry.hours} hours</span>
+                </div>
+            `).join('');
+            attendanceList.innerHTML = html;
+        }
+
+        // Update initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEmployeeData();
+            updateAccessHistory();
+        });
+    </script>
+</body>
+</html>
